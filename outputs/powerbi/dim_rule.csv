@@ -1,0 +1,9 @@
+rule_id,rule_name
+R01,High-value payment to a new payee
+R02,Payment velocity: many payments in 24 hours
+R03,New device followed by a high-value payment
+R04,Payment to a high-risk country
+R05,Dormant account suddenly active
+R06,Round-amount transfers
+R07,Failed logins followed by a payment
+R08,Money in and straight out (possible mule)

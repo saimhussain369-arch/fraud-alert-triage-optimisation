@@ -1,0 +1,9 @@
+measure,baseline,optimised,unit
+Alerts needing an investigator,17764.0,14658.0,count
+Investigator hours,3769.696666666669,3131.2116666666548,hours
+Investigator hours per week,879.5958888888894,730.6160555555527,hours
+Alerts decided within 24 hours,84.74442693087143,96.06507543346093,%
+Median hours to decision (alerts a person reviews),14.96,9.21,hours
+Median hours to decision: genuine fraud,14.765,7.655,hours
+False alarms reviewed by a person,17080.0,13987.0,count
+Genuine fraud reviewed by a person,684.0,671.0,count

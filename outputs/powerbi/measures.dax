@@ -1,0 +1,52 @@
+// Power BI measures for the fraud alert triage report.
+// Tables: fact_alert, fact_daily_kpi, dim_rule (rule_id), dim_date (date_key).
+
+Alerts = COUNTROWS ( fact_alert )
+
+Fraud Cases = CALCULATE ( [Alerts], fact_alert[is_fraud] = TRUE () )
+
+Alert Precision % = DIVIDE ( [Fraud Cases], [Alerts] )
+
+Auto-closed = CALCULATE ( [Alerts], fact_alert[triage_band] = "Auto-close", fact_alert[qa_sampled] = FALSE (), fact_alert[period] = "test" )
+
+Alerts Needing a Person (After) = CALCULATE ( [Alerts], fact_alert[period] = "test" ) - [Auto-closed]
+
+Within SLA % (Before) =
+DIVIDE (
+    CALCULATE ( [Alerts], fact_alert[hours_to_decision_baseline] <= 24 ),
+    [Alerts]
+)
+
+Within SLA % (After) =
+DIVIDE (
+    CALCULATE ( [Alerts], fact_alert[hours_to_decision_optimised] <= 24 ),
+    [Alerts]
+)
+
+Median Hours to Decision (Before) = MEDIAN ( fact_alert[hours_to_decision_baseline] )
+
+Median Hours to Decision (After) =
+CALCULATE (
+    MEDIAN ( fact_alert[hours_to_decision_optimised] ),
+    NOT ( fact_alert[triage_band] = "Auto-close" && fact_alert[qa_sampled] = FALSE () )
+)
+
+Investigator Hours (Before) = DIVIDE ( SUM ( fact_alert[handling_minutes] ), 60 )
+
+Investigator Hours (After) =
+DIVIDE (
+    CALCULATE ( SUM ( fact_alert[handling_minutes] ), fact_alert[triage_band] <> "Auto-close" )
+        + 4 * CALCULATE ( [Alerts], fact_alert[qa_sampled] = TRUE () ),
+    60
+)
+
+Hours Released = [Investigator Hours (Before)] - [Investigator Hours (After)]
+
+FTE Released =
+VAR Weeks = DIVIDE ( DISTINCTCOUNT ( fact_alert[date_key] ), 7 )
+RETURN DIVIDE ( [Hours Released], Weeks * 32.5 )
+
+Fraud Missed by Auto-close =
+CALCULATE ( [Fraud Cases], fact_alert[triage_band] = "Auto-close", fact_alert[qa_sampled] = FALSE (), fact_alert[period] = "test" )
+
+Backlog at 6pm = SUM ( fact_daily_kpi[backlog_at_6pm] )
