@@ -1,0 +1,3 @@
+prototype/*.html linguist-generated=true
+prototype/*.json linguist-generated=true
+outputs/** linguist-generated=true
